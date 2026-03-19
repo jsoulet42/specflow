@@ -156,16 +156,67 @@ Comment deploies-tu ?
 6. Autre : precisez
 ```
 
-#### Principe d'isolation des tests
+#### Strategie de tests
+
+D'abord evaluer la situation tests du projet.
+
+**Si le scan Phase 1 a detecte un framework de tests** (jest.config, phpunit.xml, pytest.ini, etc.)
+OU un repertoire de tests (__tests__/, tests/, spec/) :
+
 ```
+J'ai detecte une infra de tests existante :
+- Framework : {framework detecte}
+- Repertoire : {repertoire detecte}
+- Nb fichiers de test : {count}
+
 Comment isoles-tu tes tests des dependances externes ?
 
 1. Zero DB — logique pure, stubs/mocks manuels [RECOMMENDED pour les projets avec beaucoup de logique metier]
 2. Base en memoire (SQLite, H2) + mocks API
 3. Containers de test (testcontainers, docker-compose test)
-4. Pas encore de strategie de test
-5. Autre : precisez
+4. Autre : precisez
 ```
+
+→ Ecrire dans project-config.md : `Statut : actif`
+
+**Si le scan n'a detecte AUCUNE infra de tests** :
+
+```
+Je n'ai detecte aucune infra de tests dans ton projet.
+
+Les tests unitaires permettent de securiser le code et sont utilises
+par le workflow /specflow (etapes TDD). Comment veux-tu proceder ?
+
+1. Initialiser une infra de tests maintenant [RECOMMENDED — je cree le repertoire, le runner, et un premier test]
+2. Pas de tests pour l'instant — utiliser /specflow sans les etapes TDD
+3. J'ai des tests ailleurs, je configure manuellement
+4. Autre : precisez
+```
+
+**Si choix 1** (initialiser) :
+- Demander le framework souhaite (adapte a la stack detectee) :
+  ```
+  Quel framework de tests ?
+
+  1. {framework recommande pour la stack} [RECOMMENDED]
+  2. {alternative}
+  3. Autre : precisez
+  ```
+- Demander le principe d'isolation (menu ci-dessus)
+- Creer le repertoire de tests
+- Installer le framework (npm install --save-dev jest, pip install pytest, etc.)
+- Creer un premier fichier de test "hello world" qui passe
+- Configurer le runner (package.json scripts.test, pytest.ini, etc.)
+- Ecrire dans project-config.md : `Statut : actif`
+
+**Si choix 2** (pas de tests) :
+- Ecrire dans project-config.md : `Statut : desactive`
+- /specflow sautera les etapes 3-4 (TDD + audit tests)
+- L'audit code verifiera le code sans tests (critere B1 adapte)
+
+**Si choix 3** (config manuelle) :
+- Demander framework, runner, repertoire, conventions via menus
+- Ecrire dans project-config.md : `Statut : actif`
 
 ### Phase 4 — Generation
 

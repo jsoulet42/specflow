@@ -33,7 +33,11 @@ Liste des composants sur lesquels on peut travailler (pour le menu /specflow) :
 
 ## Tests
 
-- **Framework** : {PHPUnit, Jest, pytest, go test, cargo test, etc.}
+- **Statut** : {actif | desactive | a-initialiser}
+  - `actif` : workflow complet 9 etapes (avec TDD)
+  - `desactive` : workflow 7 etapes (sans TDD, audit code fait une revue manuelle)
+  - `a-initialiser` : /setup creera l'infra tests au prochain lancement
+- **Framework** : {PHPUnit, Jest, pytest, go test, cargo test, etc. — ou "aucun" si desactive}
 - **Runner** : {commande pour lancer les tests, ex: npm test, pytest, bash test.sh}
 - **Bootstrap / Setup** : {fichier de setup si applicable, sinon "aucun"}
 - **Repertoire tests** : {chemin relatif, ex: tests/, __tests__/, spec/}

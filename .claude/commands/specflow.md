@@ -69,9 +69,13 @@ C'est la **source de verite** pour tout le workflow.
 
 ## Etapes du workflow
 
+Le workflow s'adapte selon le champ `Tests → Statut` de project-config.md.
+
+### Mode complet (Tests : actif) — 9 etapes
+
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  /specflow — Pipeline {feature}                          │
+│  /specflow — Pipeline {feature} (mode complet)           │
 ├──────────────────────────────────────────────────────────┤
 │  1. SPECS       → spec-patron.md + spec-technique.md     │
 │  2. /audit specs → gate GO/NO-GO → rapport-audit-specs   │
@@ -83,6 +87,36 @@ C'est la **source de verite** pour tout le workflow.
 │  8. /audit recette → gate GO/NO-GO → rapport-audit-recette│
 │  9. DEPLOY      → commit, push, PR (merge par user)      │
 └──────────────────────────────────────────────────────────┘
+```
+
+### Mode sans tests (Tests : desactive) — 7 etapes
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  /specflow — Pipeline {feature} (mode sans tests)        │
+├──────────────────────────────────────────────────────────┤
+│  1. SPECS       → spec-patron.md + spec-technique.md     │
+│  2. /audit specs → gate GO/NO-GO → rapport-audit-specs   │
+│  3. BUILD       → agent-builder → rapport-builder        │
+│  4. /audit code  → gate GO/NO-GO → rapport-audit-code    │
+│  5. RECETTE     → dry-run/test → rapport-recette         │
+│  6. /audit recette → gate GO/NO-GO → rapport-audit-recette│
+│  7. DEPLOY      → commit, push, PR (merge par user)      │
+└──────────────────────────────────────────────────────────┘
+```
+
+Au demarrage, lire `project-config.md → Tests → Statut` et afficher le mode :
+```
+Mode workflow : {complet (9 etapes) | sans tests (7 etapes)}
+```
+
+Si le statut est `desactive`, proposer a chaque lancement :
+```
+Les tests sont desactives sur ce projet. Tu veux les activer ?
+
+1. Non, continuer sans tests [RECOMMENDED si pas d'infra tests]
+2. Oui, lancer /setup pour initialiser les tests
+3. Autre : precisez
 ```
 
 ## Demarrage
@@ -180,7 +214,9 @@ Lancer `/audit specs {feature}`. Si NO-GO :
 - Relancer l'audit apres corrections
 - Ne JAMAIS passer a l'etape 3 sans GO
 
-### Etape 3 — TDD
+### Etape 3 — TDD (mode complet uniquement)
+
+> **Si Tests = desactive** : sauter cette etape et passer directement au BUILD.
 
 Lancer l'agent-testeur en lui fournissant :
 - Le dossier pipeline : `.claude/pipeline/{feature}/`
@@ -199,7 +235,9 @@ Tests ecrits. Rapport testeur disponible. On passe a l'audit ?
 5. Autre : precisez
 ```
 
-### Etape 4 — /audit tests (gate)
+### Etape 4 — /audit tests (mode complet uniquement)
+
+> **Si Tests = desactive** : sauter cette etape.
 
 Lancer `/audit tests {feature}`. Meme logique gate.
 

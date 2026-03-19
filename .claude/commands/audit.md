@@ -96,7 +96,7 @@ Ils verifient l'integrite de la passation entre agents.
 
 | # | Critere | Description |
 |---|---------|-------------|
-| B1 | Tests verts | Tous les tests (nouveaux + existants) passent |
+| B1 | Tests verts | Tous les tests (nouveaux + existants) passent. **Si Tests = desactive** : remplacer par une revue manuelle approfondie du code (lire chaque fonction, verifier les entrees/sorties, simuler les cas limites mentalement). |
 | B2 | Respect specs | L'implementation suit la spec a la lettre, pas plus pas moins |
 | B3 | Perimetre respecte | Seul le code modifiable (selon project-config) a ete touche |
 | B4 | Pas de regression | Fonctionnalites existantes non cassees |
