@@ -175,6 +175,8 @@ Actions :
 3. Si brief → rediger v1 puis iterer
 4. Aussi copier dans `.claude/specs/{feature}.md` (reference perenne)
 
+**Source de verite** : `.claude/pipeline/{feature}/` est la version VIVANTE (modifiable pendant le pipeline). `.claude/specs/{feature}.md` est la version de REFERENCE (figee, copiee en fin de pipeline a l'etape DEPLOY). Pendant le pipeline, toujours modifier la version pipeline. La version reference est mise a jour une seule fois a la fin.
+
 Mettre a jour state.md. Transition :
 ```
 Specs terminees. On passe a l'audit ?
@@ -186,11 +188,17 @@ Specs terminees. On passe a l'audit ?
 
 ### Etape 2 — /audit specs (gate)
 
-Lancer `/audit specs {feature}`. Si NO-GO :
-- Afficher les points bloquants
+Lancer `/audit specs {feature}`. L'orchestrateur :
+1. Affiche un menu multiSelect des audits disponibles (conformite, completude, securite)
+2. Lance les audits choisis **en parallele** via l'outil Agent
+3. Effectue une **validation croisee** pour eliminer les faux positifs
+4. Affiche le **dashboard 3 niveaux** (verdict → bloquants → details)
+
+Si NO-GO :
+- Afficher les points bloquants (apres validation croisee)
 - Proposer les corrections via menu
 - Relancer l'audit apres corrections
-- Ne JAMAIS passer a l'etape 3 sans GO
+- Ne JAMAIS passer a l'etape suivante sans GO global
 
 ### Etape 3 — TDD [SKIP si tests desactives]
 
@@ -217,7 +225,17 @@ Tests ecrits. Rapport testeur disponible. On passe a l'audit ?
 
 > **Si Tests = desactive** : afficher `Etape 4 — /audit tests [SKIP]` et passer a l'etape 5.
 
-Lancer `/audit tests {feature}`. Meme logique gate.
+Lancer `/audit tests {feature}`. L'orchestrateur :
+1. Affiche un menu multiSelect des audits disponibles (conformite, completude)
+2. Lance les audits choisis **en parallele** via l'outil Agent
+3. Effectue une **validation croisee** pour eliminer les faux positifs
+4. Affiche le **dashboard 3 niveaux** (verdict → bloquants → details)
+
+Si NO-GO :
+- Afficher les points bloquants (apres validation croisee)
+- Proposer les corrections via menu
+- Relancer l'audit apres corrections
+- Ne JAMAIS passer a l'etape suivante sans GO global
 
 ### Etape 5 — BUILD
 
@@ -240,7 +258,17 @@ Implementation terminee. Rapport builder disponible. On passe a l'audit ?
 
 ### Etape 6 — /audit code (gate)
 
-Lancer `/audit code {feature}`. Meme logique gate.
+Lancer `/audit code {feature}`. L'orchestrateur :
+1. Affiche un menu multiSelect des audits disponibles (conformite, securite, completude)
+2. Lance les audits choisis **en parallele** via l'outil Agent
+3. Effectue une **validation croisee** pour eliminer les faux positifs
+4. Affiche le **dashboard 3 niveaux** (verdict → bloquants → details)
+
+Si NO-GO :
+- Afficher les points bloquants (apres validation croisee)
+- Proposer les corrections via menu
+- Relancer l'audit apres corrections
+- Ne JAMAIS passer a l'etape suivante sans GO global
 
 ### Etape 7 — RECETTE
 
@@ -259,7 +287,16 @@ Produire `rapport-recette.md` dans le pipeline.
 
 ### Etape 8 — /audit recette (gate)
 
-Lancer `/audit recette {feature}`. Meme logique gate.
+Lancer `/audit recette {feature}`. L'orchestrateur :
+1. Affiche un menu multiSelect des audits disponibles (conformite uniquement)
+2. Lance l'audit
+3. Affiche le **dashboard 3 niveaux** (verdict → bloquants → details)
+
+Si NO-GO :
+- Afficher les points bloquants
+- Proposer les corrections via menu
+- Relancer l'audit apres corrections
+- Ne JAMAIS passer a l'etape suivante sans GO global
 
 ### Etape 9 — DEPLOY
 
@@ -290,3 +327,8 @@ Pipeline termine ! Frictions enregistrees : {N}
 - Chaque agent DOIT produire son rapport dans le pipeline avant de passer a l'audit
 - L'audit DOIT lire tous les rapports precedents pour verifier la coherence de chaine
 - **Toujours loguer les frictions** dans frictions.md
+- **Ownership state.md** :
+  - `/specflow` est responsable de : etape courante, progression, historique
+  - `/audit` est responsable de : score audit, verdict GO/NO-GO dans l'historique
+  - Les deux ne modifient JAMAIS les champs de l'autre
+  - En cas de conflit : state.md est relu avant chaque ecriture

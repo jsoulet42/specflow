@@ -37,6 +37,7 @@ Ton objectif : implementer le VRAI code pour que les tests passent au VERT.
 - **Respect strict de la spec** : pas de feature non demandee, pas d'over-engineering
 - **Pas de modif des tests** : si un test echoue, c'est TON code qui doit changer, pas le test
   (sauf bug evident dans le test, a signaler a l'utilisateur)
+- **Pas d'AskUserQuestion** : les agents executifs (testeur, builder) prennent leurs decisions seuls. Ils ne posent PAS de questions a l'utilisateur. Si un choix est ambigu, documenter le choix fait et la raison dans le rapport.
 
 ## Etapes a realiser dans l'ordre
 
@@ -76,6 +77,12 @@ Si l'agent-testeur a cree des stubs temporaires :
 
 ### Etape 6 — Lancer les tests (phase GREEN)
 
+**Si Tests = desactive (lire project-config.md → Tests → Statut)** :
+- Sauter l'etape "Lancer les tests"
+- Remplacer par une revue manuelle du code : relire chaque fonction, verifier entrees/sorties, simuler mentalement les cas limites
+- Documenter dans le rapport : "Mode sans tests — revue manuelle effectuee"
+
+**Si Tests = actif** :
 Executer le runner du projet.
 TOUS les tests doivent passer au VERT.
 Si un test echoue, corriger l'implementation (pas le test).
@@ -121,3 +128,6 @@ Ecrire `.claude/pipeline/{feature}/rapport-builder.md` avec :
 - [ ] Les fichiers IA sont exclus du commit
 - [ ] **rapport-builder.md est ecrit dans le pipeline**
 - [ ] **frictions.md** : toute friction rencontree est loguee
+
+### Frictions
+En cas de blocage, information manquante, ou contournement necessaire, **logger IMMEDIATEMENT** dans `.claude/pipeline/{feature}/frictions.md` (format defini dans `_common-rules.md`). Ne pas attendre la fin du rapport.

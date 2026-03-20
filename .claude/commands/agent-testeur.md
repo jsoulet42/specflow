@@ -36,6 +36,7 @@ Les classes/fonctions metier n'existent PAS encore (ou partiellement). Tu dois :
 - **Chaque test documente le risque metier** s'il echoue
 - **Les tests existants** doivent continuer a passer
 - Appliquer les regles de `_common-rules.md` (regle absolue, frictions, menus)
+- **Pas d'AskUserQuestion** : les agents executifs (testeur, builder) prennent leurs decisions seuls. Ils ne posent PAS de questions a l'utilisateur. Si un choix est ambigu, documenter le choix fait et la raison dans le rapport.
 
 ## Etapes a realiser dans l'ordre
 
@@ -133,3 +134,6 @@ Ecrire `.claude/pipeline/{feature}/rapport-testeur.md` avec :
 - [ ] Les stubs/mocks sont en place
 - [ ] **rapport-testeur.md est ecrit dans le pipeline**
 - [ ] **frictions.md** : toute friction rencontree est loguee
+
+### Frictions
+En cas de blocage, information manquante, ou contournement necessaire, **logger IMMEDIATEMENT** dans `.claude/pipeline/{feature}/frictions.md` (format defini dans `_common-rules.md`). Ne pas attendre la fin du rapport.
