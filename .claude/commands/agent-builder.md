@@ -41,13 +41,20 @@ Ton objectif : implementer le VRAI code pour que les tests passent au VERT.
 
 ## Etapes a realiser dans l'ordre
 
-### Etape 1 — Lire la spec
+### Etape 1 — Lire la spec ET scanner le codebase
 
 Lire la spec complete depuis le pipeline.
 Comprendre :
 - L'architecture cible
 - Les fichiers a creer/modifier
 - Les classes/fonctions attendues
+
+**SCAN OBLIGATOIRE** : Avant de commencer a coder, scanner le codebase (grep/glob) pour identifier TOUS les fichiers concernes par la feature. Comparer avec la liste de la spec technique. Si des fichiers pertinents ne sont pas dans la spec, les AJOUTER au scope et le signaler dans le rapport.
+
+Exemple pour une feature i18n : grep tous les textes en dur dans src/ pour identifier les fichiers a modifier, pas seulement ceux listes dans la spec.
+Exemple pour une feature API : grep tous les endpoints existants pour verifier qu'aucun n'est oublie.
+
+**Regle** : Ne JAMAIS se fier uniquement a la liste de fichiers de la spec. La spec est un guide, le codebase est la verite. Le builder doit livrer un code COMPLET en une seule passe, pas en corrections successives.
 
 ### Etape 2 — Lire les tests (ils sont la spec executable)
 

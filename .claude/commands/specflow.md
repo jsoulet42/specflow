@@ -90,14 +90,9 @@ Au demarrage, lire `project-config.md → Tests → Statut` et afficher le mode 
 Mode : tests {actifs | desactives (etapes 3-4 SKIP)}
 ```
 
-Si le statut est `desactive`, proposer a chaque lancement :
-```
-Les tests sont desactives sur ce projet. Tu veux les activer ?
-
-1. Non, continuer sans tests [RECOMMENDED si pas d'infra tests]
-2. Oui, lancer /setup pour initialiser les tests
-3. Autre : precisez
-```
+Si le statut est `desactive`, proposer a chaque lancement via **AskUserQuestion** :
+- Option 1 : "Continuer sans tests (Recommended)" — description: "Pas d'infra tests configuree"
+- Option 2 : "Activer les tests" — description: "Lancer /setup pour initialiser Vitest"
 
 ## Demarrage
 
@@ -107,36 +102,25 @@ Au lancement, TOUJOURS verifier s'il existe un pipeline actif :
 1. Lister `.claude/pipeline/*/state.md`
 2. Si un pipeline existe avec une etape "EN COURS" → proposer la reprise
 
-```
-Pipeline actif detecte : {feature} ({module})
-Etape courante : {numero} — {nom}
-Progression : [████████░░] 7/9
-
-1. Reprendre a l'etape {numero} [RECOMMENDED]
-2. Repartir de zero (nouveau pipeline)
-3. Autre : precisez
-```
+Afficher la progression puis proposer via **AskUserQuestion** (header: "Reprise") :
+- Option 1 : "Reprendre etape {numero} (Recommended)" — description: "Continuer le pipeline en cours"
+- Option 2 : "Repartir de zero" — description: "Creer un nouveau pipeline pour cette feature"
 
 ### Nouveau pipeline
 
 Si pas de pipeline actif ou nouveau pipeline demande :
 
-```
-Bienvenue dans /specflow ! Configurons le projet.
+Afficher "Bienvenue dans /specflow !" puis enchainer 3 questions via **AskUserQuestion** :
 
-Module/composant cible ?
-{liste numerotee depuis project-config.md → section "Modules / composants modifiables"}
-N. Autre : precisez
+**Question 1** (header: "Module") : lister les modules depuis project-config.md → "Modules / composants"
+- Les transformer en options AskUserQuestion (max 4, regrouper si besoin)
 
-Feature ?
-> [nom libre, en kebab-case : ex. task-tickets]
+**Question 2** : demander le nom de la feature en texte libre (AskUserQuestion sans options, juste la question)
 
-Spec existante ?
-1. Oui, je charge depuis .claude/specs/ [RECOMMENDED si spec existe]
-2. Non, on la cree ensemble
-3. J'ai un brief, redige une premiere version
-4. Autre : precisez
-```
+**Question 3** (header: "Specs") :
+- Option 1 : "Charger spec existante (Recommended)" — description: "Depuis .claude/specs/" (si spec existe)
+- Option 2 : "Creer ensemble" — description: "Brainstorm collaboratif"
+- Option 3 : "J'ai un brief" — description: "Rediger une v1 a partir de ton brief"
 
 Puis :
 1. Creer le dossier `.claude/pipeline/{feature}/`
@@ -177,14 +161,9 @@ Actions :
 
 **Source de verite** : `.claude/pipeline/{feature}/` est la version VIVANTE (modifiable pendant le pipeline). `.claude/specs/{feature}.md` est la version de REFERENCE (figee, copiee en fin de pipeline a l'etape DEPLOY). Pendant le pipeline, toujours modifier la version pipeline. La version reference est mise a jour une seule fois a la fin.
 
-Mettre a jour state.md. Transition :
-```
-Specs terminees. On passe a l'audit ?
-
-1. Oui, lancer /audit specs {feature} [RECOMMENDED]
-2. Je veux relire/modifier d'abord
-3. Autre : precisez
-```
+Mettre a jour state.md. Transition via **AskUserQuestion** (header: "Specs") :
+- Option 1 : "Lancer /audit specs (Recommended)" — description: "Auditer les specs avant de coder"
+- Option 2 : "Relire/modifier d'abord" — description: "Revoir les specs avant l'audit"
 
 ### Etape 2 — /audit specs (gate)
 
@@ -210,16 +189,11 @@ Lancer l'agent-testeur en lui fournissant :
 
 L'agent-testeur produit `rapport-testeur.md` + ecrit ses frictions.
 
-Transition :
-```
-Tests ecrits. Rapport testeur disponible. On passe a l'audit ?
-
-1. Oui, lancer /audit tests {feature} [RECOMMENDED]
-2. Je veux relire les tests d'abord
-3. Lancer les tests pour voir le resultat
-4. Lire le rapport testeur
-5. Autre : precisez
-```
+Transition via **AskUserQuestion** (header: "TDD") :
+- Option 1 : "Lancer /audit tests (Recommended)" — description: "Auditer les tests avant le build"
+- Option 2 : "Relire les tests" — description: "Verifier les tests ecrits par l'agent"
+- Option 3 : "Executer les tests" — description: "Lancer npm run test:unit pour voir le resultat"
+- Option 4 : "Lire le rapport testeur" — description: "Consulter rapport-testeur.md"
 
 ### Etape 4 — /audit tests [SKIP si tests desactives]
 
@@ -245,16 +219,11 @@ Lancer l'agent-builder en lui fournissant :
 
 L'agent-builder produit `rapport-builder.md` + ecrit ses frictions.
 
-Transition :
-```
-Implementation terminee. Rapport builder disponible. On passe a l'audit ?
-
-1. Oui, lancer /audit code {feature} [RECOMMENDED]
-2. Je veux relire le code d'abord
-3. Lancer les tests pour verifier
-4. Lire le rapport builder
-5. Autre : precisez
-```
+Transition via **AskUserQuestion** (header: "Build") :
+- Option 1 : "Lancer /audit code (Recommended)" — description: "Auditer le code implemente"
+- Option 2 : "Relire le code" — description: "Inspecter les fichiers modifies"
+- Option 3 : "Executer les tests" — description: "Lancer les tests pour verifier"
+- Option 4 : "Lire le rapport builder" — description: "Consulter rapport-builder.md"
 
 ### Etape 6 — /audit code (gate)
 
@@ -272,16 +241,11 @@ Si NO-GO :
 
 ### Etape 7 — RECETTE
 
-Proposer via menu (adapter selon project-config.md → section infra) :
-```
-Comment on recette ?
-
-1. Dry-run du script de rattrapage sur prod [RECOMMENDED si script existe]
-2. Deploiement sur serveur test d'abord
-3. Deploiement direct sur prod
-4. Test manuel dans l'interface
-5. Autre : precisez
-```
+Proposer via **AskUserQuestion** (header: "Recette", adapter selon project-config.md → section infra) :
+- Option 1 : "Dry-run sur prod (Recommended)" — description: "Valider le script de rattrapage avant application" (si script existe)
+- Option 2 : "Deployer sur test" — description: "Serveur test pour valider sans risque"
+- Option 3 : "Direct sur prod" — description: "Plus rapide mais pas de filet de securite"
+- Option 4 : "Test manuel interface" — description: "Verifier visuellement dans le navigateur"
 
 Produire `rapport-recette.md` dans le pipeline.
 
@@ -306,14 +270,9 @@ Mettre a jour state.md : etape 9 = TERMINE.
 
 ## Fin de pipeline
 
-Apres l'etape 9 (DEPLOY), proposer :
-```
-Pipeline termine ! Frictions enregistrees : {N}
-
-1. Lancer /retro analyse pour ameliorer le workflow [RECOMMENDED si frictions > 0]
-2. Passer, on verra plus tard
-3. Autre : precisez
-```
+Apres l'etape 9 (DEPLOY), afficher "Pipeline termine ! Frictions enregistrees : {N}" puis proposer via **AskUserQuestion** (header: "Retro") :
+- Option 1 : "Lancer /retro (Recommended)" — description: "{N} frictions a analyser pour ameliorer le workflow" (si frictions > 0)
+- Option 2 : "Passer" — description: "On verra plus tard"
 
 ## Regles
 

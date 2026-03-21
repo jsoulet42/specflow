@@ -170,6 +170,7 @@ Pour chaque BLOQUANT signale par un audit :
 
 2. **Verification perimetre** : est-ce un detail de BUILD (comment implementer, pas quoi specifier) ?
    → Si oui : declasser en RECOMMANDATION avec mention `[declasse — detail BUILD]`
+   → **SEUIL DE PROTECTION** : Si plus de 30% des fichiers listes dans la spec ne sont PAS implementes, le bloquant de completude ne peut PAS etre declasse en "detail BUILD". Un code qui ne couvre que 70% du scope spec est incomplet, pas un detail. Ce seuil s'applique uniquement a l'etape `code`, pas a `specs` ou `tests`.
 
 3. **Deduplication** : le meme probleme est-il signale par 2 audits differents ?
    → Si oui : ne compter qu'une fois, garder la version la plus precise, mentionner l'autre audit entre parentheses

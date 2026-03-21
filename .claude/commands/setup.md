@@ -89,12 +89,10 @@ Config proposee :
 
 ...
 
-Cette config te convient ?
-1. Oui, generer project-config.md [RECOMMENDED]
-2. Je veux modifier certains champs
-3. Tout refaire manuellement
-4. Autre : precisez
-```
+Proposer via **AskUserQuestion** (header: "Config") :
+- Option 1 : "Generer project-config.md (Recommended)" — description: "La config detectee est correcte"
+- Option 2 : "Modifier certains champs" — description: "Ajuster la config avant generation"
+- Option 3 : "Tout refaire manuellement" — description: "Ignorer la detection"
 
 Si l'utilisateur choisit 2, proposer chaque section en menu dynamique pour ajuster.
 
@@ -103,58 +101,35 @@ Si l'utilisateur choisit 2, proposer chaque section en menu dynamique pour ajust
 Certaines infos ne sont PAS detectables automatiquement. Les demander via menu :
 
 #### Regle absolue
-```
-Quelle est LA regle #1 de ton projet ? (celle qu'on ne doit jamais enfreindre)
-
-1. Ne pas modifier le core du framework ({framework detecte}) [RECOMMENDED pour les projets bases sur un framework]
-2. Ne pas commit sur main sans PR
-3. Ne pas deployer sans tests verts
-4. Autre : precisez
-```
+Proposer via **AskUserQuestion** (header: "Regle #1") :
+- Option 1 : "Ne pas modifier le core du framework (Recommended)" — description: "Proteger {framework detecte}"
+- Option 2 : "Ne pas commit sur main sans PR" — description: "Workflow de review obligatoire"
+- Option 3 : "Ne pas deployer sans tests verts" — description: "Securiser les deploiements"
 
 #### Modules / composants
-```
-Quels sont les composants/modules principaux de ton projet ?
-(Ce sont les "zones de travail" que /specflow proposera dans son menu)
-
-Detectes automatiquement :
-{liste des dossiers dans src/ ou equivalent}
-
-1. Utiliser cette liste [RECOMMENDED]
-2. Ajouter/supprimer des composants
-3. Definir manuellement
-4. Autre : precisez
-```
+Afficher la liste detectee puis proposer via **AskUserQuestion** (header: "Modules") :
+- Option 1 : "Utiliser cette liste (Recommended)" — description: "Les modules detectes correspondent au projet"
+- Option 2 : "Ajouter/supprimer" — description: "Ajuster la liste detectee"
+- Option 3 : "Definir manuellement" — description: "Ignorer la detection"
 
 #### Architecture mono-repo (si plusieurs dossiers racine detectes)
 
 Si le scan detecte des indices de mono-repo (ex: `frontend/` + `backend/`, ou `packages/`,
 ou plusieurs `package.json` / `go.mod`), poser la question :
 
-```
-Je detecte plusieurs sous-projets : {liste}
-
-Ton projet est un mono-repo ?
-
-1. Oui — les composants partagent le meme repo mais sont independants [RECOMMENDED si plusieurs package.json]
-2. Non — c'est un seul projet avec des dossiers de responsabilite
-3. Autre : precisez
-```
+Afficher la liste des sous-projets detectes puis proposer via **AskUserQuestion** (header: "Mono-repo") :
+- Option 1 : "Oui, mono-repo (Recommended)" — description: "Composants independants dans le meme repo"
+- Option 2 : "Non, projet unique" — description: "Dossiers de responsabilite, pas de sous-projets"
 
 Si mono-repo : creer une section "Sous-projets" dans project-config.md listant chaque sous-projet
 avec sa stack, son runner tests, et son chemin. Les agents devront savoir dans quel sous-projet ils travaillent.
 
 #### Infrastructure
-```
-Comment deploies-tu ?
-
-1. SSH vers un serveur (je te demanderai les acces)
-2. Docker / Kubernetes
-3. Vercel / Netlify / autre PaaS
-4. CI/CD automatique (GitHub Actions, GitLab CI)
-5. Pas encore de deploiement (projet en dev)
-6. Autre : precisez
-```
+Proposer via **AskUserQuestion** (header: "Deploy") :
+- Option 1 : "PaaS (Vercel/Netlify) (Recommended)" — description: "Deploiement automatique via plateforme"
+- Option 2 : "Docker / Kubernetes" — description: "Infra containerisee"
+- Option 3 : "CI/CD (GitHub Actions)" — description: "Pipeline automatise"
+- Option 4 : "Pas encore de deploiement" — description: "Projet en cours de dev"
 
 #### Strategie de tests
 
@@ -163,45 +138,24 @@ D'abord evaluer la situation tests du projet.
 **Si le scan Phase 1 a detecte un framework de tests** (jest.config, phpunit.xml, pytest.ini, etc.)
 OU un repertoire de tests (__tests__/, tests/, spec/) :
 
-```
-J'ai detecte une infra de tests existante :
-- Framework : {framework detecte}
-- Repertoire : {repertoire detecte}
-- Nb fichiers de test : {count}
-
-Comment isoles-tu tes tests des dependances externes ?
-
-1. Zero DB — logique pure, stubs/mocks manuels [RECOMMENDED pour les projets avec beaucoup de logique metier]
-2. Base en memoire (SQLite, H2) + mocks API
-3. Containers de test (testcontainers, docker-compose test)
-4. Autre : precisez
-```
+Afficher les infos detectees puis proposer via **AskUserQuestion** (header: "Isolation") :
+- Option 1 : "Zero DB / mocks (Recommended)" — description: "Logique pure, stubs/mocks manuels"
+- Option 2 : "Base en memoire" — description: "SQLite/H2 + mocks API"
+- Option 3 : "Containers de test" — description: "testcontainers / docker-compose test"
 
 → Ecrire dans project-config.md : `Statut : actif`
 
 **Si le scan n'a detecte AUCUNE infra de tests** :
 
-```
-Je n'ai detecte aucune infra de tests dans ton projet.
-
-Les tests unitaires permettent de securiser le code et sont utilises
-par le workflow /specflow (etapes TDD). Comment veux-tu proceder ?
-
-1. Initialiser une infra de tests maintenant [RECOMMENDED — je cree le repertoire, le runner, et un premier test]
-2. Pas de tests pour l'instant — utiliser /specflow sans les etapes TDD
-3. J'ai des tests ailleurs, je configure manuellement
-4. Autre : precisez
-```
+Afficher le constat (aucune infra detectee) puis proposer via **AskUserQuestion** (header: "Tests") :
+- Option 1 : "Initialiser maintenant (Recommended)" — description: "Creer repertoire, runner et premier test"
+- Option 2 : "Pas de tests" — description: "Utiliser /specflow sans etapes TDD"
+- Option 3 : "Config manuelle" — description: "J'ai des tests ailleurs, je configure"
 
 **Si choix 1** (initialiser) :
-- Demander le framework souhaite (adapte a la stack detectee) :
-  ```
-  Quel framework de tests ?
-
-  1. {framework recommande pour la stack} [RECOMMENDED]
-  2. {alternative}
-  3. Autre : precisez
-  ```
+- Demander le framework souhaite via **AskUserQuestion** (header: "Framework") :
+  - Option 1 : "{framework recommande} (Recommended)" — description: "Le plus adapte a {stack}"
+  - Option 2 : "{alternative}" — description: "Alternative populaire"
 - Demander le principe d'isolation (menu ci-dessus)
 - Creer le repertoire de tests
 - Installer le framework (npm install --save-dev jest, pip install pytest, etc.)
@@ -232,44 +186,23 @@ par le workflow /specflow (etapes TDD). Comment veux-tu proceder ?
 
 Si le scan ne detecte aucun fichier de projet :
 
-```
-━━━ /setup — Nouveau projet ━━━
+Afficher "Aucun fichier de projet detecte. On demarre de zero !" puis proposer la stack en 2 questions **AskUserQuestion** :
 
-Je n'ai detecte aucun fichier de projet. On demarre de zero !
+**Question 1** (header: "Langage") :
+- Option 1 : "Node.js (Recommended)" — description: "React, Express, Next.js..."
+- Option 2 : "Python" — description: "Django, FastAPI, Flask..."
+- Option 3 : "PHP" — description: "Laravel, Symfony..."
+- Option 4 : "Go / Rust" — description: "Backend performant"
 
-Quelle stack veux-tu utiliser ?
-
-1. Node.js / React
-2. Node.js / Express (API)
-3. Python / Django
-4. Python / FastAPI
-5. PHP / Laravel
-6. PHP / Symfony
-7. Go
-8. Rust
-9. Autre : precisez
-```
+**Question 2** (header: "Framework") : adapter les options au langage choisi
 
 Puis guider l'initialisation avec le scaffold adapte a la stack choisie.
 Lire `.claude/commands/_scaffolds.md` pour la structure, le runner, et les actions d'initialisation.
 
-```
-Projet initialise ! Structure creee.
-
-Voici ce qui a ete fait :
-- Dossiers : {liste}
-- Gestionnaire paquets : {init command}
-- Framework tests : {framework} installe
-- Premier test : {chemin} (1 test "hello world")
-- .gitignore : cree avec .claude/ + {exclusions stack}
-
-Prochaine etape ?
-
-1. Lancer /specflow pour ta premiere feature [RECOMMENDED]
-2. Explorer le projet d'abord
-3. Configurer autre chose
-4. Autre : precisez
-```
+Afficher le recapitulatif de ce qui a ete fait puis proposer via **AskUserQuestion** (header: "Suite") :
+- Option 1 : "Lancer /specflow (Recommended)" — description: "Demarrer ta premiere feature"
+- Option 2 : "Explorer le projet" — description: "Verifier la structure avant de commencer"
+- Option 3 : "Configurer autre chose" — description: "Ajuster des parametres"
 
 ## Integration avec /specflow
 
